@@ -1,7 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:loja_virtual_pro/firebase_options.dart';
-import 'package:loja_virtual_pro/screens/base_screen.dart';
+import 'package:loja_virtual_pro/screens/base/base_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,7 +36,14 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme:
+            ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 4, 125, 141)),
+        scaffoldBackgroundColor: Color.fromARGB(255, 4, 125, 141),
+        appBarTheme: AppBarTheme(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.white,
+        ),
         useMaterial3: true,
       ),
       home: BaseScreen(),
