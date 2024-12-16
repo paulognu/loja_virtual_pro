@@ -32,6 +32,7 @@ class LoginScreen extends StatelessWidget {
                 shrinkWrap: true,
                 children: [
                   TextFormField(
+                    enabled: !userManager.isLoading,
                     controller: emailController,
                     decoration: InputDecoration(
                       hintText: "E-mail",
@@ -48,6 +49,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 8),
                   TextFormField(
+                    enabled: !userManager.isLoading,
                     controller: passController,
                     decoration: InputDecoration(
                       hintText: "Senha",
@@ -64,7 +66,7 @@ class LoginScreen extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerRight,
                     child: InkWell(
-                      onTap: () {},
+                      onTap: userManager.isLoading ? null : () {},
                       child: Text(
                         "Esqueci minha senha",
                       ),
@@ -75,38 +77,47 @@ class LoginScreen extends StatelessWidget {
                     height: 44,
                     child: ElevatedButton(
                       style: ButtonStyle(
-                          backgroundColor:
-                              WidgetStateProperty.all(primaryColor)),
-                      onPressed: () async {
-                        if (formKey.currentState!.validate()) {
-                          String email = emailController.text;
-                          String password = passController.text;
-                          userManager.sigIn(
-                            UserApp(
-                              email: email,
-                              password: password,
+                          backgroundColor: userManager.isLoading
+                              ? WidgetStateProperty.all(
+                                  primaryColor.withAlpha(100))
+                              : WidgetStateProperty.all(primaryColor)),
+                      onPressed: userManager.isLoading
+                          ? null
+                          : () async {
+                              if (formKey.currentState!.validate()) {
+                                String email = emailController.text;
+                                String password = passController.text;
+                                userManager.sigIn(
+                                  UserApp(
+                                    email: email,
+                                    password: password,
+                                  ),
+                                  onFail: (message) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content:
+                                            Text("Falha ao entrar: $message"),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  },
+                                  onSuccess: () {
+                                    // TODO: FECHAR TELA DE LOGIN
+                                  },
+                                );
+                              }
+                            },
+                      child: userManager.isLoading
+                          ? CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                          : Text(
+                              "Entrar",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                              ),
                             ),
-                            onFail: (message) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Falha ao entrar: $message"),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            },
-                            onSuccess: () {
-                              // TODO: FECHAR TELA DE LOGIN
-                            },
-                          );
-                        }
-                      },
-                      child: Text(
-                        "Entrar",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                        ),
-                      ),
                     ),
                   ),
                 ],
