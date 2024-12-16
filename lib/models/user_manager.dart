@@ -6,29 +6,43 @@ import 'package:loja_virtual_pro/models/user_app.dart';
 class UserManager extends ChangeNotifier {
   final FirebaseAuth auth = FirebaseAuth.instance;
 
-  bool _loading = false;
+  User? user;
 
+  bool _loading = false;
   bool get isLoading => _loading;
+
+  UserManager() {
+    _loadCurrentUser();
+  }
 
   Future<void> sigIn(UserApp user,
       {required Function(String) onFail, required Function onSuccess}) async {
-    setLoading(true);
+    _setLoading(true);
     try {
       final UserCredential result = await auth.signInWithEmailAndPassword(
         email: user.email,
         password: user.password,
       );
 
+      this.user = result.user;
+
       onSuccess();
     } on FirebaseAuthException catch (e) {
       onFail(getErrorString(e.code));
     }
 
-    setLoading(false);
+    _setLoading(false);
   }
 
-  setLoading(bool value) {
-    _loading = value;
-    notifyListeners();
+  void _setLoading(bool value) {
+    if (_loading != value) {
+      _loading = value;
+      notifyListeners();
+    }
+  }
+
+  void _loadCurrentUser() {
+    user = auth.currentUser;
+    debugPrint("User ID: ${user?.uid}");
   }
 }
