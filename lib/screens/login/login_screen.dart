@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:loja_virtual_pro/helpers/validators.dart';
 import 'package:loja_virtual_pro/models/user_app.dart';
@@ -82,10 +81,23 @@ class LoginScreen extends StatelessWidget {
                         if (formKey.currentState!.validate()) {
                           String email = emailController.text;
                           String password = passController.text;
-                          userManager.sigIn(UserApp(
-                            email: email,
-                            password: password,
-                          ));
+                          userManager.sigIn(
+                            UserApp(
+                              email: email,
+                              password: password,
+                            ),
+                            onFail: (message) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Falha ao entrar: $message"),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            },
+                            onSuccess: () {
+                              // TODO: FECHAR TELA DE LOGIN
+                            },
+                          );
                         }
                       },
                       child: Text(
