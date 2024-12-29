@@ -1,9 +1,14 @@
 class UserApp {
   UserApp({
-    required this.email,
-    required this.password,
+    this.email = "",
+    this.password = "",
+    this.name = "",
+    this.confirmPassword = "",
   });
 
   String email;
   String password;
+  String name;
+
+  String confirmPassword;
 }
