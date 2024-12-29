@@ -43,6 +43,7 @@ class UserManager extends ChangeNotifier {
 
   void _loadCurrentUser() {
     user = auth.currentUser;
+    // TODO: RETIRAR MENSAGEM DE DEBUG
     debugPrint("User ID: ${user?.uid}");
   }
 }
