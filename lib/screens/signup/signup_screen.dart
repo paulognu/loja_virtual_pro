@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:loja_virtual_pro/helpers/validators.dart';
 import 'package:loja_virtual_pro/models/user_app.dart';
+import 'package:loja_virtual_pro/models/user_manager.dart';
+import 'package:provider/provider.dart';
 
 class SignUpScreen extends StatelessWidget {
   SignUpScreen({super.key});
@@ -101,6 +103,16 @@ class SignUpScreen extends StatelessWidget {
                       }
 
                       // TODO: IMPLEMENTAR CÓDIGO PARA SALVAR DADOS DO NOVO USUÁRIO
+                      UserManager userManager = context.read<UserManager>();
+                      userManager.signUp(
+                          userApp: userApp,
+                          onFail: (error) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text(error),
+                              backgroundColor: Colors.red,
+                            ));
+                          },
+                          onSuccess: () {});
                     }
                   },
                   style: ButtonStyle(

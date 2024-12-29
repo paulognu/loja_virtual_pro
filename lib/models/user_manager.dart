@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:loja_virtual_pro/helpers/firebase_errors.dart';
@@ -5,8 +6,9 @@ import 'package:loja_virtual_pro/models/user_app.dart';
 
 class UserManager extends ChangeNotifier {
   final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseFirestore firesotre = FirebaseFirestore.instance;
 
-  User? user;
+  UserApp? user;
 
   bool _loading = false;
   bool get isLoading => _loading;
@@ -24,10 +26,43 @@ class UserManager extends ChangeNotifier {
         password: user.password,
       );
 
-      this.user = result.user;
+      this.user = UserApp(
+        uid: result.user!.uid,
+        name: user.name,
+        email: user.email,
+      );
 
       onSuccess();
     } on FirebaseAuthException catch (e) {
+      onFail(getErrorString(e.code));
+    }
+
+    _setLoading(false);
+  }
+
+  Future<void> signUp({
+    required UserApp userApp,
+    required Function onFail,
+    required Function onSuccess,
+  }) async {
+    _setLoading(true);
+
+    try {
+      UserCredential result = await auth.createUserWithEmailAndPassword(
+          email: userApp.email, password: userApp.password);
+      DocumentSnapshot ds =
+          await firesotre.collection('/users').doc(result.user!.uid).get();
+      user = UserApp(
+        uid: result.user!.uid,
+        name: userApp.name,
+        email: userApp.email,
+      );
+
+      await user!.saveData();
+      onSuccess();
+    } on FirebaseAuthException catch (e) {
+      // TODO: Retirar código de debug
+      debugPrint("[DEBUG]Erro firebase: ${e.code}");
       onFail(getErrorString(e.code));
     }
 
@@ -41,9 +76,14 @@ class UserManager extends ChangeNotifier {
     }
   }
 
-  void _loadCurrentUser() {
-    user = auth.currentUser;
-    // TODO: RETIRAR MENSAGEM DE DEBUG
-    debugPrint("User ID: ${user?.uid}");
+  Future<void> _loadCurrentUser() async {
+    // user = auth.currentUser;
+    // DocumentSnapshot ds =
+    //     await firesotre.collection('/users').doc(auth.currentUser!.uid).get();
+    // user = UserApp(
+    //   uid: auth.currentUser!.uid,
+    //   name: ds['name'],
+    //   email: ds['email'],
+    // );
   }
 }
